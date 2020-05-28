@@ -1,0 +1,1 @@
+This training project is made using Node.js and MongoDb
