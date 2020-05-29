@@ -47,27 +47,27 @@ exports.getIndex = (req, res, next) => {
 };
 
 // // go to cart via nav
-// exports.getCart = (req, res, next) => {
-//   req.user.getCart()
-//     .then(products => {
-//       res.render('shop/cart', {
-//         path: '/cart',
-//         pageTitle: 'Your Cart',
-//         products: products
-//       });
-//     })
-//     .catch(err => console.log(err));
-// }
+exports.getCart = (req, res, next) => {
+  req.user.getCart()
+    .then(products => {
+      res.render('shop/cart', {
+        path: '/cart',
+        pageTitle: 'Your Cart',
+        products: products
+      });
+    })
+    .catch(err => console.log(err));
+}
 
 // // add a product to cart when 'add to cart' clicked
-// exports.postCart = (req, res, next) => {
-//   const prodId = req.body.productId;
-//   Product.findById(prodId).then(product => {
-//     return req.user.addToCart(product)
-//   }).then(result => {
-//     res.redirect('/cart');
-//   })
-// };
+exports.postCart = (req, res, next) => {
+  const prodId = req.body.productId;
+  Product.findById(prodId).then(product => {
+    return req.user.addToCart(product)
+  }).then(result => {
+    res.redirect('/cart');
+  })
+};
 
 // // // delete product from cart
 // exports.postCartDeleteProduct = (req, res, next) => {

@@ -19,11 +19,12 @@ exports.postAddProduct = (req, res, next) => {
     title: title,
     price: price,
     description: description,
-    imageUrl: imageUrl
+    imageUrl: imageUrl,
+    userId: req.user
   })
   product
-  // save is provided by mongoose!
-  .save()
+    // save is provided by mongoose!
+    .save()
     .then(() => {
       res.redirect('/admin/products');
     })
@@ -62,19 +63,20 @@ exports.postEditProduct = (req, res, next) => {
 
   Product.findById(prodId).then(product => {
     product.title = updatedTitle,
-    product.pricen = updatedPrice,
-    product.description = updatedDesc,
-    product.imageUrl = updatedImageUrl
+      product.pricen = updatedPrice,
+      product.description = updatedDesc,
+      product.imageUrl = updatedImageUrl
     return product.save()
   }).then(() => {
     res.redirect('/admin/products');
   })
-  .catch(err => console.log(err));
+    .catch(err => console.log(err));
 };
 
 exports.getProducts = (req, res, next) => {
   Product.find()
     .then(products => {
+      console.log(products)
       res.render('admin/products', {
         prods: products,
         pageTitle: 'Admin Products',
@@ -86,8 +88,9 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-    Product.deleteOne({_id: mongodb.ObjectId(prodId)}).then(result => {
-      res.redirect("/admin/products")
-    })
+  // Product.findByIdAndRemove(prodId)
+  Product.deleteOne({ _id: mongodb.ObjectId(prodId) }).then(result => {
+    res.redirect("/admin/products")
+  })
     .catch(err => console.log(err));
 };

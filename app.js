@@ -22,15 +22,15 @@ app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 // Get user 
-// app.use((req, res, next) => {
-//   User.findById("5ece8cb7a00f1de49b918cc2")
-//     .then(user => {
-//       req.user = new User(user.name, user.email, user.cart, mongodb.ObjectId(user._id));
-//       console.log(req.user)
-//       next();
-//     })
-//     .catch(err => console.log(err));
-// });
+app.use((req, res, next) => {
+  User.findById("5ed0dff41f49081c9c3d7872")
+    .then(user => {
+      req.user = user
+      console.log(req.user)
+      next();
+    })
+    .catch(err => console.log(err));
+});
 
 // app routes 
 app.use('/admin', adminRoutes);
@@ -40,6 +40,18 @@ app.use(errorController.get404);
 
 // Database connexion
 db().then(result => {
+  User.findOne().then(user => {
+    if(!user) {
+      const user = new User({
+        name: 'Satoshi',
+        email: 'satoshi@gmx.com',
+        cart: {
+          items: []
+        }
+      });
+      user.save();
+    }
+  })
   app.listen(3000)
   console.log('connected!')
 })
