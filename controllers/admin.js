@@ -59,18 +59,17 @@ exports.postEditProduct = (req, res, next) => {
   const updatedPrice = req.body.price;
   const updatedImageUrl = req.body.imageUrl;
   const updatedDesc = req.body.description;
-  const product = new Product(
-    updatedTitle,
-    updatedPrice,
-    updatedImageUrl,
-    updatedDesc,
-    new ObjectId(prodId)
-  )
-  product.save()
-    .then(() => {
-      res.redirect('/admin/products');
-    })
-    .catch(err => console.log(err));
+
+  Product.findById(prodId).then(product => {
+    product.title = updatedTitle,
+    product.pricen = updatedPrice,
+    product.description = updatedDesc,
+    product.imageUrl = updatedImageUrl
+    return product.save()
+  }).then(() => {
+    res.redirect('/admin/products');
+  })
+  .catch(err => console.log(err));
 };
 
 exports.getProducts = (req, res, next) => {
@@ -85,10 +84,10 @@ exports.getProducts = (req, res, next) => {
     .catch(err => console.log(err));
 };
 
-// exports.postDeleteProduct = (req, res, next) => {
-//   const prodId = req.body.productId;
-//     Product.deleteById(prodId).then(result => {
-//       res.redirect("/admin/products")
-//     })
-//     .catch(err => console.log(err));
-// };
+exports.postDeleteProduct = (req, res, next) => {
+  const prodId = req.body.productId;
+    Product.deleteOne({_id: mongodb.ObjectId(prodId)}).then(result => {
+      res.redirect("/admin/products")
+    })
+    .catch(err => console.log(err));
+};
