@@ -5,7 +5,6 @@ const Order = require("./../models/order");
 exports.getProducts = (req, res, next) => {
   Product.find()
     .then(products => {
-      console.log(products)
       res.render('shop/product-list', {
         prods: products,
         pageTitle: 'All Products',
@@ -22,7 +21,6 @@ exports.getProduct = (req, res, next) => {
   const prodId = req.params.productId;
   Product.findById(prodId)
     .then(product => {
-      console.log(product)
       res.render('shop/product-detail', {
         product: product,
         pageTitle: product.title,

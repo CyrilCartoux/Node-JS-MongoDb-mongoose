@@ -16,6 +16,7 @@ const User = require("./models/user")
 // routes 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+const authRoutes = require('./routes/auth')
 
 // view engine : EJS
 app.set('view engine', 'ejs');
@@ -26,7 +27,6 @@ app.use((req, res, next) => {
   User.findById("5ed0dff41f49081c9c3d7872")
     .then(user => {
       req.user = user
-      console.log(req.user)
       next();
     })
     .catch(err => console.log(err));
@@ -35,6 +35,8 @@ app.use((req, res, next) => {
 // app routes 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
+// auth routes 
+app.use(authRoutes);
 // 404 not found
 app.use(errorController.get404);
 

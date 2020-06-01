@@ -42,7 +42,9 @@ form {
 
 .main-header__nav {
   height: 100%;
-  display: none;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -56,6 +58,7 @@ form {
 .main-header__item {
   margin: 0 1rem;
   padding: 0;
+  list-style: none;
 }
 
 .main-header__item a {
