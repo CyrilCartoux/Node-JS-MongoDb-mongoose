@@ -47,7 +47,10 @@ app.set('views', 'views');
 
 // Get user 
 app.use((req, res, next) => {
-  User.findById("5ed0dff41f49081c9c3d7872")
+  if(!req.session.user) {
+    return next();
+  }
+  User.findById(req.session.user._id)
     .then(user => {
       req.user = user
       next();
@@ -65,18 +68,6 @@ app.use(errorController.get404);
 
 // Database connexion
 db().then(result => {
-  User.findOne().then(user => {
-    if(!user) {
-      const user = new User({
-        name: 'Satoshi',
-        email: 'satoshi@gmx.com',
-        cart: {
-          items: []
-        }
-      });
-      user.save();
-    }
-  })
   app.listen(3000)
   console.log('connected!')
 })
