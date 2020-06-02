@@ -11,16 +11,36 @@ exports.getLogin = (req, res, next) => {
 }
 
 exports.postLogin = (req, res, next) => {
-    User.findById('5ed0dff41f49081c9c3d7872')
+    const email = req.body.email;
+    const password = req.body.password;
+    User.findOne({ email: email })
         .then(user => {
-            req.session.isLoggedIn = true;
-            req.session.user = user;
-            // to avoid redirecting while the session is not fully loaded
-            req.session.save((err) => {
-                console.log(err)
-                res.redirect("/")
-            });
 
+            if (!user) {
+                console.log('does not exists')
+                return res.redirect("/login")
+            }
+            //bcrypt returns a promise 
+            bcrypt.compare(password, user.password)
+                .then(doMatch => {
+                    if (doMatch) {
+                        // password valid
+                        req.session.isLoggedIn = true;
+                        req.session.user = user;
+                        // to avoid redirecting while the session is not fully loaded
+                        return req.session.save((err) => {
+                            console.log("signed in")
+                            res.redirect("/")
+                        });
+                    } else {
+                        console.log('password do not match')
+                        res.redirect("/login")
+                    }
+                })
+                .catch(err => {
+                    console.log(err)
+                    res.redirect("/login")
+                })
         })
         .catch(err => {
             console.log(err)
@@ -38,7 +58,7 @@ exports.postSignup = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
     const confirmPassword = req.body.confirmPassword;
-    
+
     User.findOne({ email: email }).then(userData => {
         // user already exists ?
         if (userData) {
@@ -47,20 +67,20 @@ exports.postSignup = (req, res, next) => {
         }
         // create the user
         return bcrypt.hash(password, 12)
-        .then((hashedPassword) => {
-            const user = new User({
-                email: email,
-                password: hashedPassword,
-                cart: {
-                    items: []
-                }
+            .then((hashedPassword) => {
+                const user = new User({
+                    email: email,
+                    password: hashedPassword,
+                    cart: {
+                        items: []
+                    }
+                })
+                return user.save()
             })
-            return user.save()
-        })
-        .then(() => {
-            console.log("user created!")
-            res.redirect("/")
-        })
+            .then(() => {
+                console.log("user created!")
+                res.redirect("/")
+            })
     }).catch(err => {
         console.log(err)
     })
