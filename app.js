@@ -2,6 +2,9 @@
 const express = require('express');
 const app = express();
 
+// Csurf 
+const csrf = require('csurf')
+
 // MongoDb
 const mongodb = require('mongodb')
 
@@ -24,6 +27,8 @@ app.use(session({
   store: store
 }));
 
+const csrfProtection = csrf();
+
 // path 
 const path = require('path');
 app.use(express.static(path.join(__dirname, 'public')));
@@ -41,6 +46,8 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth')
 
+app.use(csrfProtection);
+
 // view engine : EJS
 app.set('view engine', 'ejs');
 app.set('views', 'views');
@@ -56,6 +63,13 @@ app.use((req, res, next) => {
       next();
     })
     .catch(err => console.log(err));
+});
+
+// add isAuthenticated and csrf token to all request
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken()
+  next();
 });
 
 // app routes 
