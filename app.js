@@ -1,14 +1,37 @@
 // Express
 const express = require('express');
 const app = express();
+
 // MongoDb
 const mongodb = require('mongodb')
+
+// Session 
+const session = require('express-session');
+
+// Store
+const mongoDBStore = require("connect-mongodb-session")(session);
+const MONGODB_URI = require("./util/database").connexionString;
+const store = new mongoDBStore({
+  uri: MONGODB_URI,
+  collection: 'sessions'
+});
+
+// Sessions 
+app.use(session({
+  secret: 'we are all satoshi',
+  resave: false,
+  saveUninitialized: false,
+  store: store
+}));
+
 // path 
 const path = require('path');
 app.use(express.static(path.join(__dirname, 'public')));
+
 // Body parser
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
+
 // Other imports
 const db = require("./util/database").db;
 const errorController = require('./controllers/error');
