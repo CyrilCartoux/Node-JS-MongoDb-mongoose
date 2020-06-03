@@ -1,5 +1,7 @@
 const User = require("./../models/user");
 const bcrypt = require("bcryptjs");
+const nodemailer = require("nodemailer")
+const transporter = require("./../util/database").transporter;
 
 exports.getLogin = (req, res, next) => {
     let message = req.flash("error")
@@ -93,6 +95,20 @@ exports.postSignup = (req, res, next) => {
             })
             .then(() => {
                 console.log("user created!")
+                //send mail : 
+                var mailOptions = {
+                    from: 'martindurandnordvpn@gmail.com',
+                    to: '6ssou@protonmail.com',
+                    subject: 'Account created successfully !!',
+                    text: 'That was easy!'
+                };
+                transporter.sendMail(mailOptions, function(error, info){
+                    if (error) {
+                      console.log(error);
+                    } else {
+                      console.log('Email sent: ' + info.response);
+                    }
+                });
                 res.redirect("/login")
             })
     }).catch(err => {
