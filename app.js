@@ -5,8 +5,7 @@ const app = express();
 // Csurf 
 const csrf = require('csurf')
 
-// MongoDb
-const mongodb = require('mongodb')
+const flash = require("connect-flash");
 
 // Session 
 const session = require('express-session');
@@ -47,6 +46,7 @@ const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth')
 
 app.use(csrfProtection);
+app.use(flash());
 
 // view engine : EJS
 app.set('view engine', 'ejs');
