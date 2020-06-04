@@ -21,3 +21,8 @@
 .form-control textarea:focus {
   outline-color: #00695c;
 }
+
+.form-control input.invalid {
+  border-color: red;
+  box-shadow: 2px 3px 5px 0px rgba(240,17,73,1);
+}
