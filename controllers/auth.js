@@ -22,6 +22,16 @@ exports.getLogin = (req, res, next) => {
 exports.postLogin = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
+
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        return res.status(422).render("auth/login", {
+            path: '/login',
+            pageTitle: 'Login',
+            errorMessage: errors.array()[0].msg
+        })
+    }
+
     User.findOne({ email: email })
         .then(user => {
             if (!user) {
@@ -60,66 +70,60 @@ exports.getSignup = (req, res, next) => {
     res.render('auth/signup', {
         path: '/signup',
         pageTitle: 'Signup',
-        errorMessage: message
+        errorMessage: message,
+        oldInput: {
+            email: null,
+            password: null
+        }
     });
 };
 
 exports.postSignup = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
-    const confirmPassword = req.body.confirmPassword;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        console.log(errors.array())
         return res.status(422).render("auth/signup", {
             path: '/signup',
             pageTitle: 'Signup',
-            errorMessage: errors.array()[0].msg
+            errorMessage: errors.array()[0].msg,
+            oldInput: {
+                email: email,
+                password: password
+            }
         })
     }
 
-    User.findOne({ email: email })
-    .then(userDoc => {
-      if (userDoc) {
-        req.flash(
-          'error',
-          'E-Mail exists already, please pick a different one.'
-        );
-        return res.redirect('/signup');
-      }
 
-        return bcrypt.hash(password, 12)
-            .then((hashedPassword) => {
-                const user = new User({
-                    email: email,
-                    password: hashedPassword,
-                    cart: {
-                        items: []
-                    }
-                })
-                return user.save()
+    bcrypt.hash(password, 12)
+        .then((hashedPassword) => {
+            const user = new User({
+                email: email,
+                password: hashedPassword,
+                cart: {
+                    items: []
+                }
             })
-            .then(() => {
-                console.log("user created!")
-                //send mail : 
-                var mailOptions = {
-                    from: 'shop@nodejs-shop.com',
-                    to: email,
-                    subject: 'Account created successfully !!',
-                    html: '<h1>Welcome onboard !</h1> <br> <h3>Thanks for creating your account</h3>'
-                };
-                transporter.sendMail(mailOptions, function (error, info) {
-                    if (error) {
-                        console.log(error);
-                    } else {
-                        console.log('Email sent: ' + info.response);
-                    }
-                });
-                res.redirect("/login")
-            })
-    }).catch(err => {
-        console.log(err)
-    })
+            return user.save()
+        })
+        .then(() => {
+            console.log("user created!")
+            //send mail : 
+            var mailOptions = {
+                from: 'shop@nodejs-shop.com',
+                to: email,
+                subject: 'Account created successfully !!',
+                html: '<h1>Welcome onboard !</h1> <br> <h3>Thanks for creating your account</h3>'
+            };
+            transporter.sendMail(mailOptions, function (error, info) {
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                }
+            });
+            res.redirect("/login")
+        })
 }
 
 exports.postLogOut = (req, res, next) => {
