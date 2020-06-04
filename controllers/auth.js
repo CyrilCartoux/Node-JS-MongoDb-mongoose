@@ -1,13 +1,13 @@
 const User = require("./../models/user");
 const bcrypt = require("bcryptjs");
-const nodemailer = require("nodemailer")
 const transporter = require("./../util/database").transporter;
 const crypto = require("crypto")
+const { validationResult } = require("express-validator/check")
 
 exports.getLogin = (req, res, next) => {
-    let message = req.flash("error")
+    let message = req.flash('error');
     if (message.length > 0) {
-        message = message[0]
+        message = message[0];
     } else {
         message = null;
     }
@@ -16,73 +16,78 @@ exports.getLogin = (req, res, next) => {
         pageTitle: 'Login',
         errorMessage: message
     });
-}
+};
+
 
 exports.postLogin = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
     User.findOne({ email: email })
         .then(user => {
-
             if (!user) {
-                // key, value
-                req.flash('error', 'Invalid email or password')
-                console.log('does not exists')
-                return res.redirect("/login")
+                req.flash('error', 'Invalid email or password.');
+                return res.redirect('/login');
             }
-            //bcrypt returns a promise 
-            bcrypt.compare(password, user.password)
+            bcrypt
+                .compare(password, user.password)
                 .then(doMatch => {
                     if (doMatch) {
-                        // password valid
                         req.session.isLoggedIn = true;
                         req.session.user = user;
-                        // to avoid redirecting while the session is not fully loaded
-                        return req.session.save((err) => {
-                            console.log("signed in")
-                            res.redirect("/")
+                        return req.session.save(err => {
+                            console.log(err);
+                            res.redirect('/');
                         });
-                    } else {
-                        req.flash('error', 'Invalid email or password')
-                        res.redirect("/login")
                     }
+                    req.flash('error', 'Invalid email or password.');
+                    res.redirect('/login');
                 })
                 .catch(err => {
-                    console.log(err)
-                    res.redirect("/login")
-                })
+                    console.log(err);
+                    res.redirect('/login');
+                });
         })
-        .catch(err => {
-            console.log(err)
-        })
+        .catch(err => console.log(err));
 };
 
 exports.getSignup = (req, res, next) => {
-    let message = req.flash("error")
+    let message = req.flash('error');
     if (message.length > 0) {
-        message = message[0]
+        message = message[0];
     } else {
         message = null;
     }
-
-    res.render("auth/signup", {
+    res.render('auth/signup', {
         path: '/signup',
         pageTitle: 'Signup',
         errorMessage: message
-    })
-}
+    });
+};
+
 exports.postSignup = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
     const confirmPassword = req.body.confirmPassword;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(errors.array())
+        return res.status(422).render("auth/signup", {
+            path: '/signup',
+            pageTitle: 'Signup',
+            errorMessage: errors.array()[0].msg
+        })
+    }
 
-    User.findOne({ email: email }).then(userData => {
-        // user already exists ?
-        if (userData) {
-            req.flash('error', 'User already exists')
-            return res.redirect("/signup");
-        }
-        // create the user
+    User.findOne({ email: email })
+    .then(userDoc => {
+      if (userDoc) {
+        req.flash(
+          'error',
+          'E-Mail exists already, please pick a different one.'
+        );
+        return res.redirect('/signup');
+      }
+
         return bcrypt.hash(password, 12)
             .then((hashedPassword) => {
                 const user = new User({
@@ -225,15 +230,15 @@ exports.postNewPassword = (req, res, next) => {
             resetUser = user;
             return bcrypt.hash(newPassword, 12)
         })
-            .then(hashedPassword => {
-                resetUser.password = hashedPassword;
-                resetUser.resetToken = undefined;
-                resetUser.resetToken = undefined;
-                return resetUser.save();
-            })
-                .then(() => {
-                    res.redirect("/login")
-                })
+        .then(hashedPassword => {
+            resetUser.password = hashedPassword;
+            resetUser.resetToken = undefined;
+            resetUser.resetToken = undefined;
+            return resetUser.save();
+        })
+        .then(() => {
+            res.redirect("/login")
+        })
         .catch(err => {
             console.log(err)
         })
