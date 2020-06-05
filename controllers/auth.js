@@ -36,6 +36,7 @@ exports.postLogin = (req, res, next) => {
             oldInput: {
                 email: email
             },
+            // to add a CSS class to the error input
             validationErrors: errors.array()
         })
     }
@@ -56,6 +57,7 @@ exports.postLogin = (req, res, next) => {
             bcrypt
                 .compare(password, user.password)
                 .then(doMatch => {
+                    // passwords are the same : 
                     if (doMatch) {
                         req.session.isLoggedIn = true;
                         req.session.user = user;
@@ -64,6 +66,7 @@ exports.postLogin = (req, res, next) => {
                             res.redirect('/');
                         });
                     }
+                    // passwords aren't the same
                     return res.status(422).render("auth/login", {
                         path: '/login',
                         pageTitle: 'Login',

@@ -26,3 +26,7 @@
   border-color: red;
   box-shadow: 2px 3px 5px 0px rgba(240,17,73,1);
 }
+.form-control textarea.invalid {
+  border-color: red;
+  box-shadow: 2px 3px 5px 0px rgba(240,17,73,1);
+}

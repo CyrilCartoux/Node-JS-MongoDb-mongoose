@@ -4,7 +4,7 @@ const app = express();
 
 // Csurf 
 const csrf = require('csurf')
-
+// Flash
 const flash = require("connect-flash");
 
 // Session 
@@ -26,6 +26,7 @@ app.use(session({
   store: store
 }));
 
+// csrfProtection
 const csrfProtection = csrf();
 
 // path 
@@ -38,6 +39,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // Other imports
 const db = require("./util/database").db;
+// 404
 const errorController = require('./controllers/error');
 const User = require("./models/user")
 // routes 
@@ -77,7 +79,7 @@ app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 // auth routes 
 app.use(authRoutes);
-// 404 not found
+// 404 route
 app.use(errorController.get404);
 
 // Database connexion
