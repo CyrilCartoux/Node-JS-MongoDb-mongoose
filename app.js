@@ -86,7 +86,7 @@ app.use(shopRoutes);
 app.use(authRoutes);
 // 500 route 
 app.get("/500", errorController.get500)
-// 404 route
+// 404 route - catch all 
 app.use(errorController.get404);
 // Errors handling middleware :
 app.use((error, req, res, next) => {
