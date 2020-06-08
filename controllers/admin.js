@@ -14,10 +14,13 @@ exports.getAddProduct = (req, res, next) => {
 };
 
 exports.postAddProduct = (req, res, next) => {
+  console.log('post add product called')
   const title = req.body.title;
-  const imageUrl = req.body.imageUrl;
+  const imageUrl = req.file;
   const price = req.body.price;
   const description = req.body.description;
+  console.log(imageUrl)
+  
   // handle errors
   const errors = validationResult(req)
   console.log(errors)

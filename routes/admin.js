@@ -14,9 +14,6 @@ router.post('/add-product',
             .isLength({ min: 3 })
             .withMessage("Title must be larger than 3 characters")
             .trim(),
-        body("imageUrl")
-            .isURL()
-            .withMessage("Please enter a valid URL"),
         body("price")
             .isFloat(),
         body("description")
