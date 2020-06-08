@@ -2,6 +2,7 @@ const Product = require('../models/product');
 const Order = require("./../models/order");
 const fs = require("fs")
 const path = require("path")
+const PDFDocument = require("pdfkit")
 
 // /products page get all products
 exports.getProducts = (req, res, next) => {
@@ -150,14 +151,43 @@ exports.getOrders = (req, res, next) => {
 
 exports.getInvoice = (req, res, next) => {
   const orderId = req.params.orderId;
-  const invoiceName = 'invoice-' + orderId + '.pdf';
-  const invoicePath = path.join('data', 'invoices', invoiceName)
-  fs.readFile(invoicePath, (err, data) => {
-    if (err) {
-      return next(err);
-    }
-    res.setHeader("Content-Type", 'application/pdf')
-    res.setHeader("Content-Disposition", 'inline; filename="' + invoiceName + '"');
-    res.send(data);
-  })
+  Order.findById(orderId)
+    .then(order => {
+      console.log(order.user[0].userId)
+      console.log(req.user._id)
+      if (!order) {
+        console.log('no orders')
+        return next(new Error("no order found"))
+      }
+      if (order.user[0].userId.toString() !== req.user._id.toString()) {
+        console.log('unauthorized')
+        return next(new Error("unauthorized"));
+      }
+      const invoiceName = 'invoice-' + orderId + '.pdf';
+      const invoicePath = path.join('data', 'invoices', invoiceName)
+      // generate PDF 
+      const pdfDoc = new PDFDocument();
+      res.setHeader("Content-Type", 'application/pdf')
+      res.setHeader("Content-Disposition", 'inline; filename="' + invoiceName + '"');
+      pdfDoc.pipe(fs.createWriteStream(invoicePath))
+      pdfDoc.pipe(res);
+
+      pdfDoc.fontSize(26).text("Invoice - " , {
+        underline: true
+      })
+      pdfDoc.fontSize(18).text("Order n* " + orderId);
+      pdfDoc.text("---------------------------------------");
+      let totalPrice = 0;
+      order.products.forEach(prod => {
+        totalPrice += (prod.quantity * prod.product.price)
+        pdfDoc.fontSize(14).text(`(${prod.quantity})  ${prod.product.title}  -  $${prod.product.price}`);
+      });
+      pdfDoc.fontSize(14).text("---------------------------------------");
+      pdfDoc.fontSize(18).text(`Total : $${totalPrice}`)
+      pdfDoc.end();
+    })
+    .catch(err => {
+      console.log(err)
+      return next(err)
+    })
 }
