@@ -31,7 +31,7 @@ const fileStorage = multer.diskStorage({
     cb(null, 'images');
   },
   filename: (req, file, cb) => {
-    cb(null, file.fieldname + '-' + file.originalname);
+    cb(null, Date.now() + '-' + file.originalname);
   }
 });
 
@@ -57,10 +57,11 @@ const authRoutes = require('./routes/auth');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
-  multer({storage: fileStorage, fileFilter: fileFilter}).single('image')
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single('image')
 );
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use(
   session({
     secret: 'my secret',
@@ -87,7 +88,6 @@ app.use((req, res, next) => {
       if (!user) {
         return next();
       }
-      console.log('user' + user)
       req.user = user;
       next();
     })
@@ -107,7 +107,6 @@ app.use(errorController.get404);
 app.use((error, req, res, next) => {
   // res.status(error.httpStatusCode).render(...);
   // res.redirect('/500');
-  console.log(req.session)
   res.status(500).render('500', {
     pageTitle: 'Error!',
     path: '/500',
@@ -121,6 +120,6 @@ db().then(result => {
   app.listen(3000)
   console.log('connected!')
 })
-.catch(err => {
-  console.log(err)
-})
+  .catch(err => {
+    console.log(err)
+  })
