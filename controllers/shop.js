@@ -4,7 +4,7 @@ const fs = require("fs")
 const path = require("path")
 const PDFDocument = require("pdfkit")
 // objects stored by page 
-const ITEMS_PER_PAGE = 3;
+const ITEMS_PER_PAGE = 2;
 
 // /products page get all products
 exports.getProducts = (req, res, next) => {
