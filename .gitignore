@@ -3,3 +3,4 @@ util/database.js
 images
 data/
 nodemon.json
+access.log
