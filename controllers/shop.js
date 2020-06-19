@@ -4,8 +4,7 @@ const fs = require("fs")
 const path = require("path")
 const PDFDocument = require("pdfkit")
 // Stripe : 
-const privateKey = require("./../util/database").privateKey
-const stripe = require("stripe")(privateKey)
+const stripe = require("stripe")(process.env.STRIPE_KEY)
 
 // objects stored by page 
 const ITEMS_PER_PAGE = 2;
