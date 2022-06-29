@@ -1,6 +1,8 @@
 node_modules
-util/database.js
 images
 data/
 nodemon.json
+server.cert
+server.key
+access.log
 access.log

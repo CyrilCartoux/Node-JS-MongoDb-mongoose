@@ -2,7 +2,7 @@ const express = require('express');
 const adminController = require('../controllers/admin');
 const router = express.Router();
 const isAuth = require("./../middleware/is-auth");
-const { body } = require("express-validator/check");
+const { body } = require("express-validator");
 
 router.get('/add-product', isAuth, adminController.getAddProduct);
 router.get('/products', adminController.getProducts);

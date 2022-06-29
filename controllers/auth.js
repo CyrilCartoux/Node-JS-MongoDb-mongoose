@@ -2,7 +2,7 @@ const User = require("./../models/user");
 const bcrypt = require("bcryptjs");
 const transporter = require("./../util/database").transporter;
 const crypto = require("crypto")
-const { validationResult } = require("express-validator/check")
+const { validationResult } = require("express-validator")
 
 exports.getLogin = (req, res, next) => {
     let message = req.flash('error');

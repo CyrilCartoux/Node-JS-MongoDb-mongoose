@@ -13,6 +13,7 @@ const helmet = require("helmet")
 const compression = require("compression")
 const morgan = require("morgan")
 const fs = require("fs")
+const https = require("https")
 
 // Store
 const MONGODB_URI = require("./util/database").connexionString;
@@ -31,6 +32,9 @@ const fileStorage = multer.diskStorage({
     cb(null, Date.now() + '-' + file.originalname);
   }
 });
+
+const privateKey = fs.readFileSync('server.key')
+const certificate = fs.readFileSync('server.cert')
 
 const fileFilter = (req, file, cb) => {
   if (
@@ -117,7 +121,9 @@ app.use((error, req, res, next) => {
 });
 
 db().then(result => {
-  app.listen(process.env.PORT || 3000)
+  console.log('Listening to 3000 :>>');
+  https.createServer({ key: privateKey, cert: certificate }, app)
+    .listen(3000)
 })
   .catch(err => {
     console.log(err)
